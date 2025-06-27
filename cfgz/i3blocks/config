@@ -1,0 +1,32 @@
+[general]
+update_interval=1
+
+[aud]
+command=audtool current-song
+interval=3
+
+[cpu]
+command=nix-shell -p perl sysstat --run "perl  ~/.config/i3blocks/cpu_usage"
+interval=3
+
+[mem]
+command=bash ~/.config/i3blocks/memory
+interval=3
+
+[network]
+command=bash ~/.config/i3blocks/iface
+ADDRESS_FAMILY=inet6?
+interval=3
+display_wifi_name=1
+
+[volume]
+command=echo "Volume: $(pactl get-sink-volume @DEFAULT_SINK@ | grep -oE '...%' | head -n 1 | tr -d ' ')"
+interval=1
+
+[battery]
+command=nix-shell -p acpi --run "acpi | cut -d ':' -f 2"
+interval=5
+
+[clock]
+command=date '+%Y-%m-%d %H:%M:%S'
+interval=1
