@@ -27,6 +27,7 @@ in
     home.file.".mozilla/firefox/profiles.ini".source = ./cfgz/ff/profiles.ini;
     home.file.".mozilla/firefox/vaex616s.default/user.js".source = ./cfgz/ff/user.js;
     home.file.".config/audacious/eq.preset".source = ./cfgz/audacious/eq.preset;
+    home.file.".config/mpv/scripts/webm.lua".source = ./cfgz/mpv/scripts/webm.lua;
     #home.file.".kube/wuvt_oldcluster".source = /nixos-secret/k8s/wuvt_oldcluster;
     #home.file.".kube/wuvt_newcluster".source = /nixos-secret/k8s/wuvt_newcluster;
   };
