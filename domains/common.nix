@@ -23,6 +23,8 @@
   virtualisation.podman.enable = true;
   virtualisation.podman.dockerCompat = true;
 
+  # for single-command remote deployment
+  security.sudo.wheelNeedsPassword = false;
 
   # locale
   time.timeZone = "America/New_York";

@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+hosts = {
+	"keeton": "natted"
+}
+import os, sys, subprocess
+
+with open("/etc/hostname", "r") as f:
+        lh = f.read().replace("\n", "")
+
+def depl(to):
+	to = [t for t in to if t in hosts.keys()]
+	for host in to:
+		if host == lh: os.system(f"sudo nixos-rebuild switch -I nixos-config=/etc/nixos/{host}.nix")
+		else: os.system(f"ssh {hosts[host]} sudo nixos-rebuild switch -I nixos-config=/etc/nixos/{host}.nix")
+
+
+
+if len(sys.argv) > 1:
+	depl(sys.argv[1:])
+else:
+	depl([lh])
