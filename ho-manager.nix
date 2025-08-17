@@ -13,8 +13,14 @@ in
   users.users.rsk = {
     isNormalUser = true;
     description = "rsk";
+    hashedPassword = "$6$Bxa3dS0MNajGqfA7$hmzMLmAmtOrXfyOztZJB4nwabVLvyrwozqY71cZyDemFYKobfDMaoel4VRg7lmoFbZR7C10YB14vdKsDs6ytM1";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [];
+    openssh.authorizedKeys = {
+      keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbh3gdpIuefWXTHmNzQCn7gvTbwTUBJ1DGjOtTgrWj8 kurisufag1@gmail.com"
+      ];
+    };
   };
 
 
@@ -22,6 +28,7 @@ in
     home.stateVersion = "24.11";
     home.file.".bashrc".source = ./cfgz/.bashrc;
     home.file.".Xresources".source = ./cfgz/.Xresources;
+    home.file.".ssh/config".source =./cfgz/ssh_config;
     home.file.".config/i3/config".source =./cfgz/i3-config;
     home.file.".config/i3blocks/config".source = ./cfgz/i3blocks/config;
     home.file.".config/i3blocks/memory".source = ./cfgz/i3blocks/memory;

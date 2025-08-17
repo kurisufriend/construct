@@ -1,0 +1,26 @@
+Host acidburn
+    Hostname acidburn.vtluug.org
+    Port 2222
+    User rsk
+Host alexandria.wuvt.vt.edu
+    User rsk
+Host oko.wuvt.vt.edu
+    User ladmin
+Host tacomanarrows.wuvt.vt.edu
+    Hostname tacomanarrows.wuvt.vt.edu
+    Port 2222
+    User ladmin
+    IdentityFile ~/.ssh/rsk-wuvt-ed25519
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+Host *.wuvt.vt.edu !tacomanarrows.wuvt.vt.edu !oko.wuvt.vt.edu !aquadom.wuvt.vt.edu
+    ProxyJump oko.wuvt.vt.edu
+Host vtluug-git
+    Hostname git.vtluug.org
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+    Port 9000
+Host rlogin
+    Hostname rlogin.cs.vt.edu
+    User rishik
