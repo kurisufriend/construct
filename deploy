@@ -11,8 +11,7 @@ def depl(to):
 	os.system("sudo nix-channel --update")
 	to = [t for t in to if t in hosts.keys()]
 	for host in to:
-		if host == lh: os.system(f"sudo nixos-rebuild switch -I nixos-config=/etc/nixos/{host}.nix")
-		else: os.system(f"sudo nixos-rebuild --target-host={hosts[host]} --use-remote-sudo switch -I nixos-config=/etc/nixos/{host}.nix")
+		os.system(f"nixos-rebuild --target-host rsk@{hosts[host]} --use-remote-sudo -I nixos-config=/etc/nixos/{host}.nix switch")
 
 
 
