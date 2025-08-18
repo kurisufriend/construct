@@ -4,6 +4,7 @@
   imports =
     [ (modulesPath + "/installer/scan/not-detected.nix")
       ../domains/common.nix
+      ../domains/sshd.nix
       ../domains/desktop.nix
       ../domains/laptop.nix
       ../domains/mounts.nix
