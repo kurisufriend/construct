@@ -18,6 +18,11 @@
     podman-compose
   ];
 
+  # tor
+  services.tor.enable = true;
+  services.tor.client.enable = true;
+  services.tor.torsocks.enable = true;
+
   # local containers
   virtualisation.containers.enable = true;
   virtualisation.podman.enable = true;
