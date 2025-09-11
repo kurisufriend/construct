@@ -38,6 +38,7 @@ in
     home.file.".mozilla/firefox/vaex616s.default/user.js".source = ./cfgz/ff/user.js;
     home.file.".config/audacious/eq.preset".source = ./cfgz/audacious/eq.preset;
     home.file.".config/mpv".source = ./cfgz/mpv;
+    home.file.".config/mpv".source = ./cfgz/mpv;
     #home.file.".kube/wuvt_oldcluster".source = /nixos-secret/k8s/wuvt_oldcluster;
     #home.file.".kube/wuvt_newcluster".source = /nixos-secret/k8s/wuvt_newcluster;
   };

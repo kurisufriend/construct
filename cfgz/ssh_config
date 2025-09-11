@@ -14,7 +14,7 @@ Host tacomanarrows.wuvt.vt.edu
     IdentitiesOnly yes
     AddKeysToAgent yes
 Host *.wuvt.vt.edu !tacomanarrows.wuvt.vt.edu !oko.wuvt.vt.edu !aquadom.wuvt.vt.edu
-    ProxyJump oko.wuvt.vt.edu
+    ProxyJump tacomanarrows.wuvt.vt.edu
 Host vtluug-git
     Hostname git.vtluug.org
     IdentityFile ~/.ssh/id_ed25519

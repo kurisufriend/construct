@@ -12,6 +12,8 @@
     i3blocks
     pulseaudio
 
+    nemo
+
     # apps
     firefox
     thunderbird
@@ -20,5 +22,6 @@
     alacritty
     surf
     audacious
+    picard
   ];
 }
