@@ -6,7 +6,6 @@
     mpv
     dig
     ripgrep # woke `find`
-    micro # woke `nano`
 
     # languages
     python3

@@ -16,6 +16,7 @@
 
     # apps
     firefox
+    vscodium
     thunderbird
     tor-browser
     moonlight-qt
