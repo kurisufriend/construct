@@ -6,6 +6,7 @@
     mpv
     dig
     ripgrep # woke `find`
+    git
 
     # languages
     python3

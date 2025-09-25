@@ -1,8 +1,8 @@
 { config, pkgs, ... }:
 let
   home-manager = builtins.fetchTarball {
-    url = "https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz";
-    sha256 = "1mwq9mzyw1al03z4q2ifbp6d0f0sx9f128xxazwrm62z0rcgv4na";
+    url = "https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz";
+    sha256 = "1d3yhhryvfjzil22ww3b7yf6s6yip7wccnm48kf06nrkslh3mhja";
   };
 in
 {
@@ -25,7 +25,7 @@ in
 
 
   home-manager.users.rsk = {pkgs, ...}: {
-    home.stateVersion = "24.11";
+    home.stateVersion = "25.05";
     home.file.".bashrc".source = ./cfgz/.bashrc;
     home.file.".Xresources".source = ./cfgz/.Xresources;
     home.file.".ssh/config".source =./cfgz/ssh_config;
