@@ -24,21 +24,22 @@ in
   };
 
 
-  home-manager.users.rsk = {pkgs, ...}: {
-    home.stateVersion = "25.05";
-    home.file.".bashrc".source = ./cfgz/.bashrc;
-    home.file.".Xresources".source = ./cfgz/.Xresources;
-    home.file.".ssh/config".source =./cfgz/ssh_config;
-    home.file.".config/i3/config".source =./cfgz/i3-config;
-    home.file.".config/i3blocks/config".source = ./cfgz/i3blocks/config;
-    home.file.".config/i3blocks/memory".source = ./cfgz/i3blocks/memory;
-    home.file.".config/i3blocks/cpu_usage".source = ./cfgz/i3blocks/cpu_usage;
-    home.file.".config/i3blocks/iface".source = ./cfgz/i3blocks/iface;
-    home.file.".mozilla/firefox/profiles.ini".source = ./cfgz/ff/profiles.ini;
-    home.file.".mozilla/firefox/vaex616s.default/user.js".source = ./cfgz/ff/user.js;
-    home.file.".config/audacious/eq.preset".source = ./cfgz/audacious/eq.preset;
-    home.file.".config/mpv".source = ./cfgz/mpv;
-    #home.file.".kube/wuvt_oldcluster".source = /nixos-secret/k8s/wuvt_oldcluster;
-    #home.file.".kube/wuvt_newcluster".source = /nixos-secret/k8s/wuvt_newcluster;
+  home-manager.users.rsk = {config, pkgs, ...}: {
+    home = {
+      stateVersion = "25.05";
+      file = {
+        ".bashrc".source = ./cfgz/.bashrc;
+        ".Xresources".source = ./cfgz/.Xresources;
+        ".ssh/config".source =./cfgz/ssh_config;
+        ".config/i3/config".source =./cfgz/i3-config;
+        ".config/i3blocks".source = ./cfgz/i3blocks;
+        ".mozilla/firefox/profiles.ini".source = ./cfgz/ff/profiles.ini;
+        ".mozilla/firefox/vaex616s.default/user.js".source = ./cfgz/ff/user.js;
+        ".config/audacious/eq.preset".source = ./cfgz/audacious/eq.preset;
+        ".config/mpv".source = ./cfgz/mpv;
+
+        "data".source = config.lib.file.mkOutOfStoreSymlink "/mnt/cistern/nfs/home/rsk/data/";
+      };
+    };
   };
 }

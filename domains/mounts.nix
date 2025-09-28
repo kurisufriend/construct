@@ -2,14 +2,14 @@
 {
   environment.systemPackages = [ pkgs.rclone ];
   environment.etc."rclone-mnt.conf".text = ''
-    [luug]
+    [dirtycow]
     type = sftp
-    host = acidburn.vtluug.org
+    host = dirtycow.vtluug.org
     user = rsk
     key_file = /home/rsk/.ssh/id_ed25519
 '';
-  fileSystems."/mnt/luug" = {
-    device = "luug:/nfs";
+  fileSystems."/mnt/cistern" = {
+    device = "dirtycow:/cistern";
     fsType = "rclone";
     options = [
       "nodev"
