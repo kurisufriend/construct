@@ -32,7 +32,10 @@ in
         ".Xresources".source = ./cfgz/.Xresources;
         ".ssh/config".source =./cfgz/ssh_config;
         ".config/i3/config".source =./cfgz/i3-config;
-        ".config/i3blocks".source = ./cfgz/i3blocks;
+        ".config/i3blocks/config".source = ./cfgz/i3blocks/config;
+        ".config/i3blocks/memory".source = ./cfgz/i3blocks/memory;
+        ".config/i3blocks/cpu_usage".source = ./cfgz/i3blocks/cpu_usage;
+        ".config/i3blocks/iface".source = ./cfgz/i3blocks/iface;
         ".mozilla/firefox/profiles.ini".source = ./cfgz/ff/profiles.ini;
         ".mozilla/firefox/vaex616s.default/user.js".source = ./cfgz/ff/user.js;
         ".config/audacious/eq.preset".source = ./cfgz/audacious/eq.preset;
