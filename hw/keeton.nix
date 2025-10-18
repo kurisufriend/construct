@@ -9,6 +9,7 @@
       ../domains/laptop.nix
       ../domains/mounts.nix
       ../domains/tailscale.nix
+      ../domains/ygg-client.nix
     ];
 
   # hostname
