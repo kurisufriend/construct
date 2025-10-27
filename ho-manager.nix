@@ -10,6 +10,12 @@ in
     (import "${home-manager}/nixos")
   ];
 
+  users.users.root.openssh.authorizedKeys = {
+    keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbh3gdpIuefWXTHmNzQCn7gvTbwTUBJ1DGjOtTgrWj8 kurisufag1@gmail.com"
+    ];
+  };
+
   users.users.rsk = {
     isNormalUser = true;
     description = "rsk";

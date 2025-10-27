@@ -31,7 +31,11 @@
   virtualisation.podman.dockerCompat = true;
 
   # for single-command remote deployment
-  security.sudo.wheelNeedsPassword = false;
+  security.doas.enable = true;
+  security.doas.extraRules = [
+    { groups = [ "wheel" ]; noPass = false; keepEnv = true; }
+  ];
+
 
   # locale
   time.timeZone = "America/New_York";
