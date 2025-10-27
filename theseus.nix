@@ -12,7 +12,7 @@
       ./domains/common.nix
       ./domains/sshd.nix
       ./domains/desktop.nix
-#      ./domain/tailscale.nix
+      ./domains/tailscale.nix
     ];
   networking.hostName = "theseus"; # Define your hostname.
   nixpkgs.config.allowUnfree = true;

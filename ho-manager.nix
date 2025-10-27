@@ -13,6 +13,7 @@ in
   users.users.root.openssh.authorizedKeys = {
     keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbh3gdpIuefWXTHmNzQCn7gvTbwTUBJ1DGjOtTgrWj8 kurisufag1@gmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID7pEQ6Kv88EKXlS6oZkhJQQQ8ZMF7j/SgVFLCK1sXdh rsk@theseus"
     ];
   };
 
@@ -25,6 +26,7 @@ in
     openssh.authorizedKeys = {
       keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbh3gdpIuefWXTHmNzQCn7gvTbwTUBJ1DGjOtTgrWj8 kurisufag1@gmail.com"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID7pEQ6Kv88EKXlS6oZkhJQQQ8ZMF7j/SgVFLCK1sXdh rsk@theseus"
       ];
     };
   };
