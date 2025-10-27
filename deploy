@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 hosts = {
-	"keeton": "keeton"
+	"keeton": "keeton",
+	"theseus": "theseus"
+
 }
 import os, sys, subprocess
 
