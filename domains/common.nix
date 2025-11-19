@@ -7,6 +7,7 @@
     dig
     ripgrep # woke `find`
     git
+    yubikey-manager
 
     # languages
     python3
@@ -19,6 +20,10 @@
     # local containers
     podman-compose
   ];
+
+  # yubikey
+  services.pcscd.enable = true;
+  services.udev.packages = [ pkgs.yubikey-personalization ];
 
   # tor
   services.tor.enable = true;
