@@ -11,6 +11,7 @@
       ./hw/theseus.nix
       ./domains/common.nix
       ./domains/sshd.nix
+      ./domains/mounts.nix
       ./domains/desktop.nix
       ./domains/tailscale.nix
     ];
