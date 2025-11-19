@@ -24,5 +24,8 @@
     surf
     audacious
     picard
+
+    # gonna kms bro
+    zoom-us
   ];
 }
