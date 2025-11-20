@@ -24,6 +24,7 @@
     surf
     audacious
     picard
+    signal-desktop
 
     # gonna kms bro
     zoom-us
