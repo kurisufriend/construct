@@ -7,39 +7,41 @@
       ../domains/sshd.nix
       ../domains/desktop.nix
       ../domains/laptop.nix
-      ../domains/mounts.nix
-      ../domains/tailscale.nix
+#      ../domains/mounts.nix
+#      ../domains/tailscale.nix
       ../domains/ygg-client.nix
     ];
 
-  # hostname
-  networking.hostName = "keeton";
-
-
-  # devices and filesystem mounts
-  boot.initrd.luks.devices."luks-82a99c3e-cb76-4587-9cb9-008f8a682c73".device = "/dev/disk/by-uuid/82a99c3e-cb76-4587-9cb9-008f8a682c73";
+  # kernel opts
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usb_storage" "sd_mod" "sdhci_pci" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
+
+  # bootloader
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # devices and filesystem mounts
+
+  ## decrypt luks devices
+  boot.initrd.luks.devices."illegalporn".device = "/dev/disk/by-uuid/84c46af1-50ce-4de5-a1c1-b55b263c348a";
+  boot.initrd.luks.devices."swappy".device = "/dev/disk/by-uuid/d9817790-6668-49d8-be04-828bae6922b6";
+
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/dd271d82-8bf9-44c2-9bf6-773c21a45a6b";
+    { device = "/dev/mapper/illegalporn";
       fsType = "ext4";
     };
 
-  boot.initrd.luks.devices."luks-1a86c1ea-4134-4d73-8256-2f766b3d897d".device = "/dev/disk/by-uuid/1a86c1ea-4134-4d73-8256-2f766b3d897d";
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/6AF6-5C01";
+    { device = "/dev/disk/by-label/boot";
       fsType = "vfat";
-      options = [ "fmask=0077" "dmask=0077" ];
+      options = [ "fmask=0022" "dmask=0022" ];
     };
 
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/a3ba043a-e386-4ab0-973f-3e884fbb1405"; }
+    [ { device = "/dev/mapper/swappy"; }
     ];
 
   # cpu
