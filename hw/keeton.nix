@@ -7,8 +7,8 @@
       ../domains/sshd.nix
       ../domains/desktop.nix
       ../domains/laptop.nix
-#      ../domains/mounts.nix
-#      ../domains/tailscale.nix
+      ../domains/mounts.nix
+      ../domains/tailscale.nix
       ../domains/ygg-client.nix
     ];
 
@@ -20,7 +20,7 @@
 
   # bootloader
   boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  #boot.loader.efi.canTouchEfiVariables = true;
 
   # devices and filesystem mounts
 
