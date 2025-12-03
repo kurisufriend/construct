@@ -49,4 +49,14 @@
 
   boot.initrd.luks.devices."luks-3f4dc0f5-e9fa-4214-8961-0c4fb9547f39".keyFile = "/boot/crypto_keyfile.bin";
   networking.networkmanager.enable = true;
+
+  #gfx
+  hardware.graphics.enable = true;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia = {
+    modesetting.enable = true;
+    open = false;
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+  };
 }
