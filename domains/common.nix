@@ -3,11 +3,14 @@
   environment.systemPackages = with pkgs; [
     # terminal utils
     htop
-    mpv
+    mpv # not in 'desktop.nix` for audio reasons
     dig
     ripgrep # woke `find`
     git
     yubikey-manager
+    age
+    tmux
+    mtr
 
     # languages
     python3
