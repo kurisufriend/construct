@@ -13,7 +13,9 @@
       ./domains/sshd.nix
       ./domains/mounts.nix
       ./domains/desktop.nix
+      ./domains/gaymen.nix
       ./domains/tailscale.nix
+      ./domains/ygg-client.nix
     ];
   networking.hostName = "theseus"; # Define your hostname.
   nixpkgs.config.allowUnfree = true;
