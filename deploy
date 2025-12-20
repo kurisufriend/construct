@@ -13,7 +13,7 @@ def depl(to):
 	os.system("sudo nix-channel --update")
 	to = [t for t in to if t in hosts.keys()]
 	for host in to:
-		os.system(f"nixos-rebuild --target-host root@{hosts[host]} --use-remote-sudo -I nixos-config=/etc/nixos/{host}.nix switch")
+		os.system(f"nixos-rebuild --target-host root@{hosts[host]} --use-remote-sudo -I nixos-config=/etc/nixos/hosts/{host}/{host}.nix switch")
 
 
 

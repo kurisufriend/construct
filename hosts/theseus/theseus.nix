@@ -7,15 +7,14 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./ho-manager.nix
-      ./hw/theseus.nix
-      ./domains/common.nix
-      ./domains/sshd.nix
-      ./domains/mounts.nix
-      ./domains/desktop.nix
-      ./domains/gaymen.nix
-      ./domains/tailscale.nix
-      ./domains/ygg-client.nix
+      ./hardware-configuration.nix
+      ../../roles/common.nix
+      ../../domains/sshd.nix
+      ../../domains/mounts.nix
+      ../../domains/desktop.nix
+      ../../domains/gaymen.nix
+      ../../domains/tailscale.nix
+      ../../domains/ygg-client.nix
     ];
   networking.hostName = "theseus"; # Define your hostname.
   nixpkgs.config.allowUnfree = true;

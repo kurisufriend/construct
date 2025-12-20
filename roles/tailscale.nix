@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  authkey = "/nixos-secret/tailscale";
+  authkey = "/state/secrets/tailscale";
 in
 {
   services.tailscale.enable = builtins.pathExists authkey;

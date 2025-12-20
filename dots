@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+
+dots = {
+    ".bashrc": None,
+    ".Xresources": None,
+    ".ssh/config": "ssh_config",
+    ".config/i3/config": "i3-config",
+    ".config/i3blocks/config": "i3blocks/config",
+    ".config/i3blocks/memory": "i3blocks/config",
+    ".config/i3blocks/cpu_usage": "i3blocks/config",
+    ".config/i3blocks/iface": "i3blocks/config",
+    ".mozilla/firefox/profiles.ini": "ff/profiles.ini",
+    ".mozilla/firefox/vaex616s.default/user.js": "ff/user.js",
+
+    "data": "/mnt/cistern/home/rsk/data"
+}
+import os
+from sys import exit
+
+base = os.path.dirname(os.path.abspath(__file__)) + "/cfgz/"
+for dst in dots.keys():
+    src = dst if dots[dst] is None else dots[dst]
+    # sources that start with a `/` are assumed to be absolute
+    src = base + src if not dst.startswith("/") else src
+
+    dst = "/state/home/rsk/" + dst
+
+    err = ""
+    if not os.path.exists(src):
+        err = "source does not exist"
+    if not os.path.islink(dst):
+        err = "dst already exists, and is NOT a symlink"
+    
+    if err != "":
+        print(src, dst, err)
+        sys.exit(1)
+    
+    print("deleting", dst)
+    os.unlink(dst)
+
+    print("linking", src, "to", dst)
+    os.symlink(src, dst)

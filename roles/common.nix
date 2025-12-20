@@ -9,6 +9,7 @@
     git
     yubikey-manager
     age
+    sshfs
     tmux
     mtr
 
@@ -38,12 +39,10 @@
   virtualisation.podman.enable = true;
   virtualisation.podman.dockerCompat = true;
 
-  # for single-command remote deployment
   security.doas.enable = true;
   security.doas.extraRules = [
     { groups = [ "wheel" ]; noPass = false; keepEnv = true; }
   ];
-
 
   # locale
   time.timeZone = "America/New_York";
