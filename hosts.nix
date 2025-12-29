@@ -19,4 +19,4 @@
     "install-to"  = "/dev/sda";
     "fde"         = "tpm";
   };
-};
+}

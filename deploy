@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-hosts = {
-	"keeton": "keeton",
-	"theseus": "theseus"
 
-}
-import os, sys, subprocess
+import os, sys, subprocess, json
 
-with open("/etc/hostname", "r") as f:
-        lh = f.read().replace("\n", "")
+def nix_loads(filepath):
+    result = subprocess.run(
+        ["nix-instantiate", "--eval", "--json", "--strict", filepath],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    return json.loads(result.stdout)
+
+hosts = nix_loads("hosts.nix")
 
 def depl(to):
 	os.system("sudo nix-channel --update")
 	to = [t for t in to if t in hosts.keys()]
 	for host in to:
-		os.system(f"nixos-rebuild --target-host root@{hosts[host]} --use-remote-sudo -I nixos-config=/etc/nixos/hosts/{host}/{host}.nix switch")
+		os.system(f"nixos-rebuild --target-host root@{hosts[host]["endpoint"]} --use-remote-sudo -I nixos-config=/etc/nixos/hosts/{host}/{host}.nix switch")
 
-
+with open("/etc/hostname", "r") as f:
+    lh = f.read().replace("\n", "")
 
 if len(sys.argv) > 1:
 	depl(sys.argv[1:])
