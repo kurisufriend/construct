@@ -27,16 +27,21 @@ for dst in dots.keys():
 
     err = ""
     if not os.path.exists(src):
-        err = "source does not exist"
-    if not os.path.islink(dst):
-        err = "dst already exists, and is NOT a symlink"
-    
+        err = "source does not exist\n"
+    if os.path.exists(dst) and not os.path.islink(dst):
+        err += "dst already exists, and is NOT a symlink\n"
+
     if err != "":
         print(src, dst, err)
-        sys.exit(1)
+        exit(1)
     
-    print("deleting", dst)
-    os.unlink(dst)
+    bld = "/".join(dst.split("/")[:-1])
+    if "/" in dst and not os.path.exists(bld):
+        print(f"securing the existence of our dirs and a future for {dst} symlinks")
+        os.system("mkdir -p "+bld)
+    if os.path.exists(dst):
+        print("deleting", dst)
+        os.unlink(dst)
 
     print("linking", src, "to", dst)
     os.symlink(src, dst)
