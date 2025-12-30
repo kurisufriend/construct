@@ -10,7 +10,7 @@ let
   };
 in
   {
-    "keeton" = mkHost {endpoint = "keeton"; swap = "hibernate"};
+    "keeton" = mkHost {endpoint = "keeton"; swap = "hibernate";};
     "theseus" = mkHost {endpoint = "theseus"; style = "bios";};
     "imp" = mkHost {endpoint = "imp"; fde = "tpm";};
     "regent" = mkHost {endpoint = "regent"; fde = "tpm";};
