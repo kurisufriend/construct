@@ -26,21 +26,14 @@ cat <<EOF > "$OVERRIDE"
     fsType = "vfat"; 
   };
 
-  boot.initrd.luks.devices."cryptroot" = {
-    device = "/dev/disk/by-partlabel/illegalporn";
-    preLVM = false;
-    allowDiscards = true;
-  };
+  boot.initrd.luks.devices."cryptroot" = {device = lib.mkForce "/dev/disk/by-partlabel/illegalporn";};
   
   boot.initrd.systemd.enable = true;
 EOF
 
 if [ "$swap" == "hibernate" ]; then
 cat <<EOF >> "$OVERRIDE"
-  boot.initrd.luks.devices."cryptswap" = {
-    device = "/dev/disk/by-partlabel/swappy";
-    preLVM = false;
-  };
+  boot.initrd.luks.devices."cryptswap" = {device = "/dev/disk/by-partlabel/swappy";};
   
   swapDevices = lib.mkForce [ { device = "/dev/mapper/cryptswap"; } ];
   boot.resumeDevice = "/dev/mapper/cryptswap";
