@@ -11,6 +11,8 @@
   users.users.rsk = {
     isNormalUser = true;
     description = "rsk";
+    home = "/state/home/rsk"
+    createHome = true
     hashedPassword = "$6$Bxa3dS0MNajGqfA7$hmzMLmAmtOrXfyOztZJB4nwabVLvyrwozqY71cZyDemFYKobfDMaoel4VRg7lmoFbZR7C10YB14vdKsDs6ytM1";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [];
