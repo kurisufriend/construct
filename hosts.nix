@@ -1,22 +1,17 @@
-{
-  "keeton" = {
-    "endpoint"    = "keeton"; #tailscale
-    "install-to"  = "/dev/sda";
-    "fde"         = "pass";
+let
+  mkHost = {
+    endpoint,
+    install-to ? "/dev/sda",
+    fde ? "pass",
+    style ? "uefi",
+    swap ? "none"
+  }: {
+    inherit endpoint install-to fde style;
   };
-  "theseus" = {
-    "endpoint"    = "theseus"; #tailscale
-    "install-to"  = "/dev/sda";
-    "fde"         = "pass";
-  };
-  "imp" = {
-    "endpoint"    = "imp"; #tailscale
-    "install-to"  = "/dev/sda";
-    "fde"         = "tpm";
-  };
-  "regent" = {
-    "endpoint"    = "regent"; #tailscale
-    "install-to"  = "/dev/sda";
-    "fde"         = "tpm";
-  };
-}
+in
+  {
+    "keeton" = mkHost {endpoint = "keeton"; swap = "hibernate"};
+    "theseus" = mkHost {endpoint = "theseus"; style = "bios";};
+    "imp" = mkHost {endpoint = "imp"; fde = "tpm";};
+    "regent" = mkHost {endpoint = "regent"; fde = "tpm";};
+  }

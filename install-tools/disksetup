@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# figure out what we're installing
+
+read -p "host? " hostn
+tgtdisk=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["install-to"]')
+fde=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["fde"]')
+style=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["style"]')
+echo "install $hostn to $tgtdisk as $style with $fde FDE. bail now or forever hold your disk." && pause
+
+# disk shit
+
+wipefs -a "$tgtdisk"
+parted "$tgtdisk" -- mklabel gpt
+
+## calc swap size
+swapsize=$(($(awk '/MemTotal/ {print $2}' /proc/meminfo) / 1024 + 1024)) #1g buffer
+
+## boot part
+
+if [ "$style" == "uefi" ]; then
+    p1_start=1
+    p1_end=$((p1_start + 512))
+    
+    parted "$tgtdisk" -- mkpart ESP fat32 ${p1_start}MiB ${p1_end}MiB
+    parted "$tgtdisk" -- set 1 esp on
+    BOOT_PART="${tgtdisk}1"
+    
+    NEXT_START=$p1_end
+else
+    p1_start=1 # bios, so we have another lil part for boot
+    p1_end=2
+    
+    p2_start=$p1_end
+    p2_end=$((p2_start + 512))
+    
+    parted "$tgtdisk" -- mkpart "BIOS boot partition" fat32 ${p1_start}MiB ${p1_end}MiB
+    parted "$tgtdisk" -- set 1 bios_grub on
+    
+    parted "$tgtdisk" -- mkpart primary ext4 ${p2_start}MiB ${p2_end}MiB
+    BOOT_PART="${tgtdisk}2"
+    
+    NEXT_START=$p2_end
+fi
+
+## swap and root
+
+if [ "$swap" == "hibernate" ]; then
+    swap_end=$((NEXT_START + swapsize))
+    
+    parted "$tgtdisk" -- mkpart primary linux-swap ${NEXT_START}MiB ${swap_end}MiB
+    
+    if [ "$style" == "uefi" ]; then
+        SWAP_PART="${tgtdisk}2"
+        ROOT_PART="${tgtdisk}3"
+    else
+        SWAP_PART="${tgtdisk}3"
+        ROOT_PART="${tgtdisk}4"
+    fi
+    
+    parted "$tgtdisk" -- mkpart primary ext4 ${swap_end}MiB 100%
+else
+    if [ "$style" == "uefi" ]; then
+        ROOT_PART="${tgtdisk}2"
+    else
+        ROOT_PART="${tgtdisk}3"
+    fi
+    
+    parted "$tgtdisk" -- mkpart primary ext4 ${NEXT_START}MiB 100%
+fi
+
+parted "$tgtdisk" -- name $(echo $ROOT_PART | grep -o '[0-9]*$') "illegalporn"
+if [ "$swap" == "hibernate" ]; then
+    parted "$tgtdisk" -- name $(echo $SWAP_PART | grep -o '[0-9]*$') "swappy"
+fi
+
+## luks
+
+LUKS_TYPE="luks1"
+[ "$fde" == "tpm" ] && LUKS_TYPE="luks2"
+
+echo -n "luks password? "
+read -s PASSWORD
+
+echo -n "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "illegalporn" "$ROOT_PART" -
+echo -n "$PASSWORD" | cryptsetup luksOpen "$ROOT_PART" cryptroot -
+
+if [ "$swap" == "hibernate" ]; then
+    echo -n "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "swappy" "$SWAP_PART" -
+    echo -n "$PASSWORD" | cryptsetup luksOpen "$SWAP_PART" cryptswap -
+fi
+
+unset PASSWORD
+
+## fmt
+
+if [ "$style" == "uefi" ]; then
+    mkfs.fat -F 32 -n boot "$BOOT_PART"
+else
+    mkfs.ext4 -L boot "$BOOT_PART"
+fi
+
+mkfs.ext4 -L nixos /dev/mapper/cryptroot
+
+if [ "$swap" == "hibernate" ]; then
+    mkswap -L swap /dev/mapper/cryptswap
+fi
+
+## mount
+
+mount /dev/disk/by-label/nixos /mnt
+mkdir -p /mnt/boot
+mount /dev/disk/by-label/boot /mnt/boot
+
+if [ "$swap_mode" == "hibernate" ]; then
+    swapon /dev/mapper/cryptswap
+fi

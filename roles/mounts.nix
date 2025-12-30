@@ -6,13 +6,13 @@
     type = sftp
     host = acidburn.vtluug.org
     user = rsk
-    key_file = /home/rsk/.ssh/id_ed25519
+    key_file = /state/home/rsk/.ssh/id_ed25519
 
     [rlogin]
     type = sftp
     host = rlogin.cs.vt.edu
     user = rishik
-    key_file = /home/rsk/.ssh/id_ed25519
+    key_file = /state/home/rsk/.ssh/id_ed25519
 '';
   fileSystems."/mnt/cistern" = {
     device = "luug-cistern:/nfs/cistern";

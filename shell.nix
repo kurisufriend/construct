@@ -4,6 +4,7 @@ pkgs.mkShell {
     git
     python3
     age
+    jq
   ];
   shellHook = ''
   '';
