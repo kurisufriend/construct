@@ -6,6 +6,7 @@ read -p "host? " hostn
 tgtdisk=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["install-to"]')
 fde=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["fde"]')
 style=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["style"]')
+swap=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["swap"]')
 echo "install $hostn to $tgtdisk as $style with $fde FDE. bail now or forever hold your disk." && pause
 
 set -evx
@@ -110,10 +111,13 @@ fi
 
 ## mount
 
+###some fuck shit happens if you don't wait a sec here.
+sleep 3
+
 mount /dev/disk/by-label/nixos /mnt
 mkdir -p /mnt/boot
 mount /dev/disk/by-label/boot /mnt/boot
 
-if [ "$swap_mode" == "hibernate" ]; then
+if [ "$swap" == "hibernate" ]; then
     swapon /dev/mapper/cryptswap
 fi

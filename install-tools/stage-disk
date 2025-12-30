@@ -28,3 +28,10 @@ for f in ./secrets/*.age; do
     chmod 600 "/mnt/state/secrets/$output_name"
 done
 
+# clone repo for later use
+
+git clone git@github.com:kurisufriend/construct.git /mnt/state/construct
+
+# gen initial cfg
+
+nixos-generate-config --root /mnt

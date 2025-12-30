@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+
+read -p "host? " hostn
+
+tgtdisk=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["install-to"]')
+fde=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["fde"]')
+style=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["style"]')
+swap=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["swap"]')
+OVERRIDE="/mnt/etc/nixos/overrides.nix"
+
+cat <<EOF > "$OVERRIDE"
+{ config, pkgs, lib, ... }:
+{
+  # :)
+
+  fileSystems."/" = { 
+    device = lib.mkForce "/dev/disk/by-label/nixos"; 
+    fsType = "ext4"; 
+  };
+  fileSystems."/boot" = { 
+    device = lib.mkForce "/dev/disk/by-label/boot"; 
+    fsType = "vfat"; 
+  };
+
+  boot.initrd.luks.devices."cryptroot" = {
+    device = "/dev/disk/by-partlabel/illegalporn";
+    preLVM = false;
+    allowDiscards = true;
+  };
+  
+  boot.initrd.systemd.enable = true;
+EOF
+
+if [ "$swap" == "hibernate" ]; then
+cat <<EOF >> "$OVERRIDE"
+  boot.initrd.luks.devices."cryptswap" = {
+    device = "/dev/disk/by-partlabel/swappy";
+    preLVM = false;
+  };
+  
+  swapDevices = lib.mkForce [ { device = "/dev/mapper/cryptswap"; } ];
+  boot.resumeDevice = "/dev/mapper/cryptswap";
+EOF
+fi
+
+if [ "$style" == "uefi" ]; then
+    cat <<EOF >> "$OVERRIDE"
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+EOF
+else
+    sed -i 's|fsType = "vfat"|fsType = "ext4"|' "$OVERRIDE"
+    
+    cat <<EOF >> "$OVERRIDE"
+  boot.loader.grub.enable = true;
+  boot.loader.grub.version = 2;
+  boot.loader.grub.device = "$tgtdisk";
+EOF
+fi
+
+if [ "$fde" == "tpm" ]; then
+    cat <<EOF >> "$OVERRIDE"
+  boot.initrd.luks.devices."cryptroot".crypttabExtraOpts = [ "tpm2-device=auto" ];
+EOF
+    if [ "$swap" == "hibernate" ]; then
+        echo '  boot.initrd.luks.devices."cryptswap".crypttabExtraOpts = [ "tpm2-device=auto" ];' >> "$OVERRIDE"
+    fi
+fi
+
+echo "}" >> "$OVERRIDE"
+
+sed -i 's|./hardware-configuration.nix|./hardware-configuration.nix ./overrides.nix|' "/mnt/etc/nixos/configuration.nix"
