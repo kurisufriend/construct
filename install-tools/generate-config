@@ -14,7 +14,7 @@ cat <<EOF > "$OVERRIDE"
 {
   # :)
 
-  networking.hostname = "$hostn";
+  networking.hostName = "$hostn";
   nixpkgs.config.allowUnfree = true;
 
   fileSystems."/" = { 
