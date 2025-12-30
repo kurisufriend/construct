@@ -8,7 +8,7 @@ fde=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["fde"
 style=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["style"]')
 echo "install $hostn to $tgtdisk as $style with $fde FDE. bail now or forever hold your disk." && pause
 
-set -vx
+set -evx
 
 # disk shit
 
