@@ -21,7 +21,7 @@
     tor-browser
     moonlight-qt
     alacritty
-    surf
+    # broken surf
     audacious
     picard
     signal-desktop

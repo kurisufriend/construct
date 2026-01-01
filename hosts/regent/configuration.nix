@@ -7,6 +7,8 @@
       ../../roles/common.nix
       ../../roles/tailscale.nix
       ../../roles/sshd.nix
+      ../../roles/ygg-client.nix
+      ../../roles/desktop.nix
     ];
   networking.networkmanager.enable = true;
   system.stateVersion = "25.11"; # Did you read the comment?

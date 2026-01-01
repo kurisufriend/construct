@@ -6,7 +6,6 @@
       ../../roles/users.nix
       ../../roles/common.nix
       ../../roles/sshd.nix
-      ../../roles/desktop.nix
       ../../roles/tailscale.nix
       ../../roles/ygg-client.nix
     ];
