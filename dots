@@ -7,9 +7,9 @@ dots = {
     ".ssh/config": "ssh_config",
     ".config/i3/config": "i3-config",
     ".config/i3blocks/config": "i3blocks/config",
-    ".config/i3blocks/memory": "i3blocks/config",
-    ".config/i3blocks/cpu_usage": "i3blocks/config",
-    ".config/i3blocks/iface": "i3blocks/config",
+    ".config/i3blocks/memory": "i3blocks/memory",
+    ".config/i3blocks/cpu_usage": "i3blocks/cpu_usage",
+    ".config/i3blocks/iface": "i3blocks/iface",
     ".mozilla/firefox/profiles.ini": "ff/profiles.ini",
     ".mozilla/firefox/vaex616s.default/user.js": "ff/user.js",
 
