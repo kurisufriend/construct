@@ -30,7 +30,7 @@ done
 
 # clone repo for later use
 
-git clone git@github.com:kurisufriend/construct.git /mnt/state/construct
+git clone https://github.com/kurisufriend/construct /mnt/state/construct
 
 # gen initial cfg
 
