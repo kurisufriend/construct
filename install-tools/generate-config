@@ -57,6 +57,7 @@ fi
 
 if [ "$fde" == "tpm" ]; then
     cat <<EOF >> "$OVERRIDE"
+  boot.initrd.availableKernelModules = [ "tpm_tis" "tpm_crb" ];
   boot.initrd.luks.devices."cryptroot".crypttabExtraOpts = [ "tpm2-device=auto" ];
 EOF
     if [ "$swap" == "hibernate" ]; then

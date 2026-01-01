@@ -2,6 +2,8 @@
 {
   # :)
 
+  boot.initrd.availableKernelModules = [ "tpm_tis" "tpm_crb" ];
+
   networking.hostName = "imp";
   nixpkgs.config.allowUnfree = true;
 
