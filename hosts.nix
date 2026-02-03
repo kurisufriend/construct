@@ -11,7 +11,7 @@ let
 in
   {
     "keeton" = mkHost {endpoint = "keeton"; swap = "hibernate";};
-    "theseus" = mkHost {endpoint = "theseus"; style = "bios";};
+    "armsmaster" = mkHost {endpoint = "armsmaster";};
     "imp" = mkHost {endpoint = "imp"; fde = "tpm";};
     "regent" = mkHost {endpoint = "regent"; fde = "tpm";};
   }
