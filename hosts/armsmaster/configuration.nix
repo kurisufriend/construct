@@ -5,7 +5,7 @@
       ./hardware-configuration.nix ./overrides.nix
       ../../roles/users.nix
       ../../roles/common.nix
-#      ../../roles/tailscale.nix
+      ../../roles/tailscale.nix
       ../../roles/sshd.nix
       ../../roles/ygg-client.nix
       ../../roles/desktop.nix
