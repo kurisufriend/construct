@@ -3,7 +3,7 @@ let
   authkey = "/state/secrets/tailscale";
 in
 {
-  services.tailscale.enable = builtins.pathExists authkey;
-  services.tailscale.authKeyFile = if builtins.pathExists authkey then authkey else null;
+  services.tailscale.enable = true;
+  services.tailscale.authKeyFile = authkey;
   systemd.services.tailscaled.after = ["NetworkManager-wait-online.service"];
 }
