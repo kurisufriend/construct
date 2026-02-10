@@ -61,4 +61,6 @@
 
   networking.useDHCP = lib.mkDefault true;
   networking.networkmanager.enable = true;
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }
