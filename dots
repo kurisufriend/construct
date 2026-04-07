@@ -22,7 +22,7 @@ base = os.path.dirname(os.path.abspath(__file__)) + "/cfgz/"
 for dst in dots.keys():
     src = dst if dots[dst] is None else dots[dst]
     # sources that start with a `/` are assumed to be absolute
-    src = base + src if not dst.startswith("/") else src
+    src = base + src if not src.startswith("/") else src
 
     dst = "/state/home/rsk/" + dst
 
