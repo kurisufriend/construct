@@ -23,6 +23,9 @@
 
     # local containers
     podman-compose
+
+    # slop
+    opencode
   ];
 
   # yubikey
@@ -44,6 +47,8 @@
     { groups = [ "wheel" ]; noPass = false; keepEnv = true; }
   ];
 
+  services.pipewire.pulse.enable = true;
+
   # locale
   time.timeZone = "America/New_York";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -63,4 +68,6 @@
   networking.networkmanager.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.substituters = [ "https://cache.garnix.io" "https://cache.nixos.org" ];
+  nix.settings.trusted-public-keys = [ "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=" ];
 }

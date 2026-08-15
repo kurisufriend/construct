@@ -11,6 +11,8 @@
       ../../roles/desktop.nix
       ../../roles/mounts.nix
       ../../roles/gaymen.nix
+      ../../roles/virt.nix
+#      ../../roles/isolation.nix
     ];
   networking.networkmanager.enable = true;
   system.stateVersion = "25.11"; # Did you read the comment?
@@ -23,5 +25,11 @@
     open = false;
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
+  };
+
+  services.sunshine = {
+    enable = true;
+    autoStart = true;
+    # capSysAdmin = true;
   };
 }
