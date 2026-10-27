@@ -1,15 +1,32 @@
 #!/usr/bin/env bash
 
-# figure out what we're installing
+set +x
+set -euo pipefail
 
-read -p "host? " hostn
-tgtdisk=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["install-to"]')
-fde=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["fde"]')
-style=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["style"]')
-swap=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["swap"]')
-echo "install $hostn to $tgtdisk as $style with $fde FDE. bail now or forever hold your disk." && pause
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+read -r -p "host? " hostn
+host_config=$(nix-instantiate --eval --json --strict "$repo_dir/hosts.nix" | jq -ce --arg host "$hostn" '.[$host] | select(type == "object")')
+tgtdisk=$(jq -er '.["install-to"]' <<< "$host_config")
+fde=$(jq -er '.fde' <<< "$host_config")
+style=$(jq -er '.style' <<< "$host_config")
+swap=$(jq -er '.swap' <<< "$host_config")
+[[ "$fde" == pass || "$fde" == tpm ]] || { echo "Unsupported FDE mode: $fde" >&2; exit 1; }
+[[ "$style" == uefi || "$style" == bios ]] || { echo "Unsupported boot style: $style" >&2; exit 1; }
+[[ "$swap" == none || "$swap" == hibernate ]] || { echo "Unsupported swap mode: $swap" >&2; exit 1; }
+root_label=illegalporn
+swap_label=swappy
+if [[ "$hostn" == cozen ]]; then
+    root_label=cozen-root
+    swap_label=cozen-swap
+fi
 
-set -evx
+[[ -b "$tgtdisk" ]] || { echo "Not a block device: $tgtdisk" >&2; exit 1; }
+printf 'Erase %s for %s (%s, %s FDE, %s swap).\n' "$tgtdisk" "$hostn" "$style" "$fde" "$swap"
+read -r -p "Type the full disk path to confirm: " confirmation
+[[ "$confirmation" == "$tgtdisk" ]] || { echo 'Cancelled.' >&2; exit 1; }
+
+partition_prefix=$tgtdisk
+[[ "$tgtdisk" =~ [0-9]$ ]] && partition_prefix+=p
 
 # disk shit
 
@@ -27,7 +44,7 @@ if [ "$style" == "uefi" ]; then
     
     parted "$tgtdisk" -- mkpart ESP fat32 ${p1_start}MiB ${p1_end}MiB
     parted "$tgtdisk" -- set 1 esp on
-    BOOT_PART="${tgtdisk}1"
+    BOOT_PART="${partition_prefix}1"
     
     NEXT_START=$p1_end
 else
@@ -41,7 +58,7 @@ else
     parted "$tgtdisk" -- set 1 bios_grub on
     
     parted "$tgtdisk" -- mkpart primary ext4 ${p2_start}MiB ${p2_end}MiB
-    BOOT_PART="${tgtdisk}2"
+    BOOT_PART="${partition_prefix}2"
     
     NEXT_START=$p2_end
 fi
@@ -54,27 +71,27 @@ if [ "$swap" == "hibernate" ]; then
     parted "$tgtdisk" -- mkpart primary linux-swap ${NEXT_START}MiB ${swap_end}MiB
     
     if [ "$style" == "uefi" ]; then
-        SWAP_PART="${tgtdisk}2"
-        ROOT_PART="${tgtdisk}3"
+        SWAP_PART="${partition_prefix}2"
+        ROOT_PART="${partition_prefix}3"
     else
-        SWAP_PART="${tgtdisk}3"
-        ROOT_PART="${tgtdisk}4"
+        SWAP_PART="${partition_prefix}3"
+        ROOT_PART="${partition_prefix}4"
     fi
     
     parted "$tgtdisk" -- mkpart primary ext4 ${swap_end}MiB 100%
 else
     if [ "$style" == "uefi" ]; then
-        ROOT_PART="${tgtdisk}2"
+        ROOT_PART="${partition_prefix}2"
     else
-        ROOT_PART="${tgtdisk}3"
+        ROOT_PART="${partition_prefix}3"
     fi
     
     parted "$tgtdisk" -- mkpart primary ext4 ${NEXT_START}MiB 100%
 fi
 
-parted "$tgtdisk" -- name $(echo $ROOT_PART | grep -o '[0-9]*$') "illegalporn"
+parted "$tgtdisk" -- name "${ROOT_PART#"$partition_prefix"}" "$root_label"
 if [ "$swap" == "hibernate" ]; then
-    parted "$tgtdisk" -- name $(echo $SWAP_PART | grep -o '[0-9]*$') "swappy"
+    parted "$tgtdisk" -- name "${SWAP_PART#"$partition_prefix"}" "$swap_label"
 fi
 
 ## luks
@@ -83,14 +100,16 @@ LUKS_TYPE="luks1"
 [ "$fde" == "tpm" ] && LUKS_TYPE="luks2"
 
 echo -n "luks password? "
-read -s PASSWORD
+read -r -s PASSWORD
+printf '\n'
+trap 'unset PASSWORD' EXIT
 
-echo -n "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "illegalporn" "$ROOT_PART" -
-echo -n "$PASSWORD" | cryptsetup luksOpen "$ROOT_PART" cryptroot -
+printf '%s' "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "$root_label" "$ROOT_PART" -
+printf '%s' "$PASSWORD" | cryptsetup luksOpen "$ROOT_PART" cryptroot -
 
 if [ "$swap" == "hibernate" ]; then
-    echo -n "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "swappy" "$SWAP_PART" -
-    echo -n "$PASSWORD" | cryptsetup luksOpen "$SWAP_PART" cryptswap -
+    printf '%s' "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "$swap_label" "$SWAP_PART" -
+    printf '%s' "$PASSWORD" | cryptsetup luksOpen "$SWAP_PART" cryptswap -
 fi
 
 unset PASSWORD

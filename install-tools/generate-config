@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 
 
-read -p "host? " hostn
+set +x
+set -euo pipefail
 
-tgtdisk=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["install-to"]')
-fde=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["fde"]')
-style=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["style"]')
-swap=$(nix-instantiate --eval --json --strict hosts.nix | jq -r '.'$hostn'.["swap"]')
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+read -r -p "host? " hostn
+host_config=$(nix-instantiate --eval --json --strict "$repo_dir/hosts.nix" | jq -ce --arg host "$hostn" '.[$host] | select(type == "object")')
+tgtdisk=$(jq -er '.["install-to"]' <<< "$host_config")
+fde=$(jq -er '.fde' <<< "$host_config")
+style=$(jq -er '.style' <<< "$host_config")
+swap=$(jq -er '.swap' <<< "$host_config")
+[[ "$fde" == pass || "$fde" == tpm ]] || { echo "Unsupported FDE mode: $fde" >&2; exit 1; }
+[[ "$style" == uefi || "$style" == bios ]] || { echo "Unsupported boot style: $style" >&2; exit 1; }
+[[ "$swap" == none || "$swap" == hibernate ]] || { echo "Unsupported swap mode: $swap" >&2; exit 1; }
+root_label=illegalporn
+swap_label=swappy
+if [[ "$hostn" == cozen ]]; then
+    root_label=cozen-root
+    swap_label=cozen-swap
+fi
 OVERRIDE="/mnt/etc/nixos/overrides.nix"
 
 cat <<EOF > "$OVERRIDE"
@@ -26,14 +39,14 @@ cat <<EOF > "$OVERRIDE"
     fsType = "vfat"; 
   };
 
-  boot.initrd.luks.devices."cryptroot" = {device = lib.mkForce "/dev/disk/by-partlabel/illegalporn";};
+  boot.initrd.luks.devices."cryptroot" = {device = lib.mkForce "/dev/disk/by-partlabel/$root_label";};
   
   boot.initrd.systemd.enable = true;
 EOF
 
 if [ "$swap" == "hibernate" ]; then
 cat <<EOF >> "$OVERRIDE"
-  boot.initrd.luks.devices."cryptswap" = {device = "/dev/disk/by-partlabel/swappy";};
+  boot.initrd.luks.devices."cryptswap" = {device = "/dev/disk/by-partlabel/$swap_label";};
   
   swapDevices = lib.mkForce [ { device = "/dev/mapper/cryptswap"; } ];
   boot.resumeDevice = "/dev/mapper/cryptswap";

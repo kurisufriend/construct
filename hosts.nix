@@ -6,7 +6,7 @@ let
     style ? "uefi",
     swap ? "none"
   }: {
-    inherit endpoint install-to fde style;
+    inherit endpoint install-to fde style swap;
   };
 in
   {
@@ -14,4 +14,5 @@ in
     "armsmaster" = mkHost {endpoint = "armsmaster";};
     "imp" = mkHost {endpoint = "imp"; fde = "tpm";};
     "regent" = mkHost {endpoint = "regent"; fde = "tpm";};
+    "cozen" = mkHost {endpoint = "cozen"; install-to = "/dev/nvme0n1"; fde = "pass"; swap = "hibernate";};
   }

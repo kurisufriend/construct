@@ -1,3 +1,42 @@
 #!/usr/bin/env bash
 
-systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+4+7 /dev/disk/by-partlabel/illegalporn
+set +x
+set -euo pipefail
+
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+read -r -p "host? " hostn
+host_config=$(nix-instantiate --eval --json --strict "$repo_dir/hosts.nix" | jq -ce --arg host "$hostn" '.[$host] | select(type == "object")')
+tgtdisk=$(jq -er '.["install-to"]' <<< "$host_config")
+fde=$(jq -er '.fde' <<< "$host_config")
+style=$(jq -er '.style' <<< "$host_config")
+swap=$(jq -er '.swap' <<< "$host_config")
+[[ "$fde" == pass || "$fde" == tpm ]] || { echo "Unsupported FDE mode: $fde" >&2; exit 1; }
+[[ "$style" == uefi || "$style" == bios ]] || { echo "Unsupported boot style: $style" >&2; exit 1; }
+[[ "$swap" == none || "$swap" == hibernate ]] || { echo "Unsupported swap mode: $swap" >&2; exit 1; }
+root_label=illegalporn
+swap_label=swappy
+if [[ "$hostn" == cozen ]]; then
+    root_label=cozen-root
+    swap_label=cozen-swap
+fi
+
+[[ "$fde" == tpm ]] || { echo "Host $hostn does not use TPM unlocking." >&2; exit 1; }
+volumes=("/dev/disk/by-partlabel/$root_label")
+if [[ "$swap" == hibernate ]]; then
+    volumes+=("/dev/disk/by-partlabel/$swap_label")
+fi
+
+# Validate every volume before changing any enrollment.
+for volume in "${volumes[@]}"; do
+    [[ -b "$volume" ]] || { echo "Partition missing: $volume" >&2; exit 1; }
+    cryptsetup luksDump --dump-json-metadata "$volume" > /dev/null
+done
+
+for volume in "${volumes[@]}"; do
+    metadata=$(cryptsetup luksDump --dump-json-metadata "$volume")
+    if jq -e 'any(.tokens[]?; .type == "systemd-tpm2")' <<< "$metadata" > /dev/null; then
+        printf '%s is already enrolled with the TPM.\n' "$volume"
+    else
+        systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+4+7 "$volume"
+    fi
+done

@@ -24,3 +24,7 @@ Host vtluug-git
 Host rlogin
     Hostname rlogin.cs.vt.edu
     User rishik
+Host *
+    IdentityFile ~/.ssh/id_ed25519_sk_rk
+    IdentityFile ~/.ssh/id_ed25519
+    IdentityFile ~/.ssh/id_rsa
