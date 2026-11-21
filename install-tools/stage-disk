@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+shopt -s nullglob
+mountpoint -q /mnt || { echo "Mount the target root at /mnt first." >&2; exit 1; }
 # create dirs
 
 declare -A dirs=(
@@ -20,6 +23,7 @@ done
 # unpack secrets
 
 for f in ./secrets/*.age; do
+    [[ ${1:-} != --skip-secrets ]] || break
     filename=$(basename "$f")
     output_name="${filename%.age}"
     
@@ -30,7 +34,10 @@ done
 
 # clone repo for later use
 
-git clone https://github.com/kurisufriend/construct /mnt/state/construct
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+if [[ ! -e /mnt/state/construct ]]; then
+    cp -a "$repo_dir" /mnt/state/construct || exit 1
+fi
 
 # gen initial cfg
 

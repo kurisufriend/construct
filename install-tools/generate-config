@@ -14,6 +14,10 @@ swap=$(jq -er '.swap' <<< "$host_config")
 [[ "$fde" == pass || "$fde" == tpm ]] || { echo "Unsupported FDE mode: $fde" >&2; exit 1; }
 [[ "$style" == uefi || "$style" == bios ]] || { echo "Unsupported boot style: $style" >&2; exit 1; }
 [[ "$swap" == none || "$swap" == hibernate ]] || { echo "Unsupported swap mode: $swap" >&2; exit 1; }
+if [[ $(jq -r .filesystem <<< "$host_config") == zfs ]]; then
+    echo "Install using nixos-install --flake /mnt/state/construct#$hostn"
+    exit 0
+fi
 root_label=illegalporn
 swap_label=swappy
 if [[ "$hostn" == cozen ]]; then

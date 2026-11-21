@@ -15,9 +15,9 @@ swap=$(jq -er '.swap' <<< "$host_config")
 [[ "$swap" == none || "$swap" == hibernate ]] || { echo "Unsupported swap mode: $swap" >&2; exit 1; }
 root_label=illegalporn
 swap_label=swappy
-if [[ "$hostn" == cozen ]]; then
-    root_label=cozen-root
-    swap_label=cozen-swap
+if [[ "$hostn" == cozen || $(jq -r .filesystem <<< "$host_config") == zfs ]]; then
+    root_label=$hostn-root
+    swap_label=$hostn-swap
 fi
 
 [[ "$fde" == tpm ]] || { echo "Host $hostn does not use TPM unlocking." >&2; exit 1; }

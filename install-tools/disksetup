@@ -13,11 +13,17 @@ swap=$(jq -er '.swap' <<< "$host_config")
 [[ "$fde" == pass || "$fde" == tpm ]] || { echo "Unsupported FDE mode: $fde" >&2; exit 1; }
 [[ "$style" == uefi || "$style" == bios ]] || { echo "Unsupported boot style: $style" >&2; exit 1; }
 [[ "$swap" == none || "$swap" == hibernate ]] || { echo "Unsupported swap mode: $swap" >&2; exit 1; }
+filesystem=$(jq -r '.filesystem // "ext4"' <<< "$host_config")
+if [[ "$filesystem" == zfs ]]; then
+    command -v zpool >/dev/null
+    modprobe zfs
+    if zpool list -H "$hostn" >/dev/null 2>&1; then echo "Pool already imported" >&2; exit 1; fi
+fi
 root_label=illegalporn
 swap_label=swappy
-if [[ "$hostn" == cozen ]]; then
-    root_label=cozen-root
-    swap_label=cozen-swap
+if [[ "$hostn" == cozen || "$filesystem" == zfs ]]; then
+    root_label=$hostn-root
+    swap_label=$hostn-swap
 fi
 
 [[ -b "$tgtdisk" ]] || { echo "Not a block device: $tgtdisk" >&2; exit 1; }
@@ -104,11 +110,11 @@ read -r -s PASSWORD
 printf '\n'
 trap 'unset PASSWORD' EXIT
 
-printf '%s' "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "$root_label" "$ROOT_PART" -
+printf '%s' "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" "$ROOT_PART" -
 printf '%s' "$PASSWORD" | cryptsetup luksOpen "$ROOT_PART" cryptroot -
 
 if [ "$swap" == "hibernate" ]; then
-    printf '%s' "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" --label "$swap_label" "$SWAP_PART" -
+    printf '%s' "$PASSWORD" | cryptsetup luksFormat --type "$LUKS_TYPE" "$SWAP_PART" -
     printf '%s' "$PASSWORD" | cryptsetup luksOpen "$SWAP_PART" cryptswap -
 fi
 
@@ -122,7 +128,16 @@ else
     mkfs.ext4 -L boot "$BOOT_PART"
 fi
 
-mkfs.ext4 -L nixos /dev/mapper/cryptroot
+if [[ "$filesystem" == zfs ]]; then
+    parted "$tgtdisk" -- name "${BOOT_PART#"$partition_prefix"}" "$hostn-boot"
+    zpool create -o ashift=12 -O compression=lz4 -O mountpoint=none "$hostn" /dev/mapper/cryptroot
+    zfs create -o mountpoint=legacy -o com.sun:auto-snapshot=false "$hostn/nix"
+    for dataset in root state; do
+        zfs create -o mountpoint=legacy -o com.sun:auto-snapshot=true "$hostn/$dataset"
+    done
+else
+    mkfs.ext4 -L nixos /dev/mapper/cryptroot
+fi
 
 if [ "$swap" == "hibernate" ]; then
     mkswap -L swap /dev/mapper/cryptswap
@@ -133,9 +148,16 @@ fi
 ###some fuck shit happens if you don't wait a sec here.
 sleep 3
 
-mount /dev/disk/by-label/nixos /mnt
+if [[ "$filesystem" == zfs ]]; then
+    mount -t zfs "$hostn/root" /mnt
+    mkdir -p /mnt/state /mnt/nix
+    mount -t zfs "$hostn/nix" /mnt/nix
+    mount -t zfs "$hostn/state" /mnt/state
+else
+    mount /dev/mapper/cryptroot /mnt
+fi
 mkdir -p /mnt/boot
-mount /dev/disk/by-label/boot /mnt/boot
+mount "$BOOT_PART" /mnt/boot
 
 if [ "$swap" == "hibernate" ]; then
     swapon /dev/mapper/cryptswap

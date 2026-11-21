@@ -4,15 +4,17 @@ let
     install-to ? "/dev/sda",
     fde ? "pass",
     style ? "uefi",
-    swap ? "none"
+    swap ? "none",
+    filesystem ? "zfs"
   }: {
-    inherit endpoint install-to fde style swap;
+    inherit endpoint install-to fde style swap filesystem;
   };
 in
   {
-    "keeton" = mkHost {endpoint = "keeton"; swap = "hibernate";};
-    "armsmaster" = mkHost {endpoint = "armsmaster";};
-    "imp" = mkHost {endpoint = "imp"; fde = "tpm";};
-    "regent" = mkHost {endpoint = "regent"; fde = "tpm";};
-    "cozen" = mkHost {endpoint = "cozen"; install-to = "/dev/nvme0n1"; fde = "pass"; swap = "hibernate";};
+    "keeton" = mkHost {filesystem = "ext4"; endpoint = "keeton"; swap = "hibernate";};
+    "armsmaster" = mkHost {filesystem = "ext4"; endpoint = "armsmaster";};
+    "imp" = mkHost {filesystem = "ext4"; endpoint = "imp"; fde = "tpm";};
+    "regent" = mkHost {filesystem = "ext4"; endpoint = "regent"; fde = "tpm";};
+    "khepri" = mkHost {endpoint = "khepri"; install-to = "/dev/nvme0n1"; swap = "hibernate";};
+    "cozen" = mkHost {filesystem = "ext4"; endpoint = "cozen"; install-to = "/dev/nvme0n1"; fde = "pass"; swap = "hibernate";};
   }

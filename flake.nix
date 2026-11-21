@@ -12,6 +12,7 @@
       
       hostDirs = lib.filterAttrs (name: type: type == "directory") (builtins.readDir hostsDir);
       hostNames = builtins.attrNames hostDirs;
+      inventory = import ./hosts.nix;
 
       mkConfig = name:
         let
@@ -24,7 +25,8 @@
         lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
-          modules = [ entryPoint ];
+          modules = [ entryPoint ] ++ lib.optional ((inventory.${name}.filesystem or "ext4") == "zfs")
+            (import ./roles/zfs-root.nix { inherit name; host = inventory.${name}; });
         };
     in {
       nixosConfigurations = lib.genAttrs hostNames mkConfig;
